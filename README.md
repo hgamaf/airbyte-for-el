@@ -6,8 +6,10 @@ Este guia fornece instruções detalhadas para instalar e configurar o Airbyte n
 
 - macOS (este guia é otimizado para macOS)
 - Docker Desktop instalado e rodando
-- Pelo menos 8GB de RAM disponível
+- Pelo menos 4GB de RAM disponível (8GB recomendado)
 - 10GB de espaço livre em disco
+
+**Nota**: Para máquinas com recursos limitados, use o modo `--low-resource-mode` durante a instalação.
 
 ## Métodos de Instalação
 
@@ -80,14 +82,22 @@ curl -LsfS https://get.airbyte.com | bash -s -- --version=0.50.0
 Para instalar e iniciar o Airbyte localmente:
 
 ```bash
-# Instalar o Airbyte localmente
+# Instalar o Airbyte localmente (modo padrão)
 abctl local install
+
+# Instalar em modo de baixo consumo de recursos
+abctl local install --low-resource-mode
 
 # O comando acima irá:
 # - Baixar as imagens Docker necessárias
 # - Configurar o ambiente local
 # - Iniciar todos os serviços
 ```
+
+**Quando usar o modo de baixo consumo:**
+- Máquinas com menos de 8GB de RAM
+- Ambientes de desenvolvimento com recursos limitados
+- Quando você quer economizar recursos do sistema
 
 ### Comandos Úteis
 
@@ -172,6 +182,10 @@ docker stats
 
 # Limpar containers não utilizados
 docker system prune -a
+
+# Se tiver problemas de memória, reinstale em modo de baixo consumo
+abctl local uninstall
+abctl local install --low-resource-mode
 ```
 
 ### Erro de Cookie/Autenticação
