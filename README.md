@@ -174,6 +174,26 @@ docker stats
 docker system prune -a
 ```
 
+### Erro de Cookie/Autenticação
+Se você receber o erro: "Your credentials were correct, but the server failed to set a cookie. You appear to have deployed over HTTP. Make sure you have disabled secure cookies."
+
+**Solução:**
+```bash
+# Parar os serviços
+abctl local stop
+
+# Reinstalar com configurações corretas
+abctl local install
+
+# Verificar se os serviços estão rodando corretamente
+abctl local status
+```
+
+**Alternativas:**
+- Limpe o cache do navegador e cookies
+- Tente acessar em uma aba anônima/privada
+- Verifique se não há conflitos de porta
+
 ### Logs de debug
 ```bash
 # Ver logs detalhados
@@ -204,6 +224,7 @@ abctl local install --upgrade
 
 ## Recursos Adicionais
 
+- **Vídeo Tutorial**: [Airbyte Installation Guide](https://www.youtube.com/watch?v=DfWMYccd-Vg) - Tutorial completo de instalação
 - **Documentação Oficial**: https://docs.airbyte.com/
 - **GitHub**: https://github.com/airbytehq/airbyte
 - **Community Slack**: https://slack.airbyte.com/
