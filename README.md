@@ -104,6 +104,9 @@ abctl local start
 # Ver logs
 abctl local logs
 
+# Obter credenciais de acesso
+abctl local credentials
+
 # Desinstalar completamente
 abctl local uninstall
 ```
@@ -113,7 +116,19 @@ abctl local uninstall
 Após a instalação bem-sucedida:
 
 1. **Interface Web**: Acesse http://localhost:8000
-2. **Credenciais padrão**:
+
+2. **Descobrir Credenciais**:
+   ```bash
+   # Obter as credenciais de acesso atuais
+   abctl local credentials
+   ```
+   
+   Este comando retornará:
+   - URL de acesso (normalmente http://localhost:8000)
+   - Email de login
+   - Senha atual
+
+3. **Credenciais padrão** (caso não tenha personalizado):
    - Email: `airbyte@example.com`
    - Senha: `password`
 
