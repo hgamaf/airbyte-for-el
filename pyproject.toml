@@ -1,7 +1,10 @@
 [project]
 name = "airbyte-for-el"
 version = "0.1.0"
-description = "Add your description here"
+description = "Projeto para testar Airbyte opensource com dados de exemplo"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "psycopg2-binary>=2.9.0",
+    "faker>=20.0.0",
+]
