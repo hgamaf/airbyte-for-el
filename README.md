@@ -188,25 +188,87 @@ abctl local uninstall
 abctl local install --low-resource-mode
 ```
 
-### Erro de Cookie/Autenticação
+### Erro de Cookie/Autenticação (COMUM)
 Se você receber o erro: "Your credentials were correct, but the server failed to set a cookie. You appear to have deployed over HTTP. Make sure you have disabled secure cookies."
 
-**Solução:**
+**Solução Completa (Passo a Passo):**
+
+1. **Desinstalar e reinstalar com modo de baixo consumo:**
 ```bash
-# Parar os serviços
-abctl local stop
+# Desinstalar completamente
+abctl local uninstall
 
-# Reinstalar com configurações corretas
-abctl local install
-
-# Verificar se os serviços estão rodando corretamente
-abctl local status
+# Reinstalar em modo de baixo consumo (mais estável)
+abctl local install --low-resource-mode
 ```
 
-**Alternativas:**
-- Limpe o cache do navegador e cookies
-- Tente acessar em uma aba anônima/privada
-- Verifique se não há conflitos de porta
+2. **Corrigir configurações de cookies:**
+```bash
+# Aplicar correção de cookies seguros
+kubectl --kubeconfig=/Users/$USER/.airbyte/abctl/abctl.kubeconfig patch configmap airbyte-abctl-airbyte-env -n airbyte-abctl --type merge -p '{"data":{"AB_COOKIE_SECURE":"false","AB_COOKIE_SAME_SITE":"None"}}'
+
+# Reiniciar o servidor para aplicar mudanças
+kubectl --kubeconfig=/Users/$USER/.airbyte/abctl/abctl.kubeconfig rollout restart deployment/airbyte-abctl-server -n airbyte-abctl
+```
+
+3. **Aguardar e testar:**
+```bash
+# Aguardar 30 segundos para o servidor reiniciar
+sleep 30
+
+# Obter novas credenciais
+abctl local credentials
+```
+
+**Soluções por Navegador:**
+- ✅ **Chrome**: Geralmente funciona melhor com as configurações acima
+- ⚠️ **Safari**: Pode ter problemas com cookies em localhost - use modo privado
+- ⚠️ **Firefox**: Pode precisar desabilitar proteções extras - use modo privado
+
+**Alternativas Adicionais:**
+- Limpe completamente o cache e cookies do navegador
+- Tente em uma aba anônima/privada (RECOMENDADO)
+- Use um navegador diferente (Chrome é mais tolerante)
+- Verifique se não há conflitos de porta com `lsof -i :8000`
+- Aguarde alguns minutos após a instalação para todos os serviços estabilizarem
+
+**Se ainda não funcionar:**
+```bash
+# Verificar se todos os pods estão rodando
+kubectl --kubeconfig=/Users/$USER/.airbyte/abctl/abctl.kubeconfig get pods -n airbyte-abctl
+
+# Ver logs do servidor para diagnosticar
+kubectl --kubeconfig=/Users/$USER/.airbyte/abctl/abctl.kubeconfig logs -n airbyte-abctl deployment/airbyte-abctl-server --tail=20
+```
+
+### Problemas de Navegador
+Se o Airbyte não carregar ou apresentar erros de interface:
+
+**Soluções por Navegador:**
+```bash
+# Chrome (Recomendado)
+# - Geralmente funciona melhor
+# - Mais tolerante com cookies localhost
+# - Use modo incógnito se houver problemas
+
+# Safari
+# - Pode bloquear cookies de localhost
+# - Vá em Preferências > Privacidade > Desmarcar "Impedir rastreamento entre sites"
+# - Use modo privado
+
+# Firefox
+# - Pode ter proteções extras ativas
+# - Vá em about:config e defina network.cookie.sameSite.laxByDefault = false
+# - Use modo privado
+```
+
+**Limpeza de Cache:**
+```bash
+# Limpar dados do navegador para localhost:8000
+# 1. Abra as ferramentas de desenvolvedor (F12)
+# 2. Clique com botão direito no ícone de atualizar
+# 3. Selecione "Esvaziar cache e recarregar forçadamente"
+```
 
 ### Logs de debug
 ```bash
@@ -216,6 +278,24 @@ abctl local logs --follow
 # Logs de um serviço específico
 abctl local logs webapp
 abctl local logs server
+
+# Logs via kubectl (mais detalhados)
+kubectl --kubeconfig=/Users/$USER/.airbyte/abctl/abctl.kubeconfig logs -n airbyte-abctl deployment/airbyte-abctl-server --tail=50
+```
+
+### Verificação de Status Completa
+```bash
+# Status geral
+abctl local status
+
+# Status detalhado dos pods
+kubectl --kubeconfig=/Users/$USER/.airbyte/abctl/abctl.kubeconfig get pods -n airbyte-abctl
+
+# Verificar se o ingress está funcionando
+kubectl --kubeconfig=/Users/$USER/.airbyte/abctl/abctl.kubeconfig get ingress -n airbyte-abctl
+
+# Testar conectividade
+curl -I http://localhost:8000
 ```
 
 ## Atualizações
